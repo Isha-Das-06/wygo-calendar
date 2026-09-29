@@ -7,9 +7,11 @@ communitech
 buildersclub
 wygo
 waterloo-engineering
+uwengsoc
 sipnscalewaterloo
 ramp-emerging-talent
 larkwin
 u/uwux
 u/nsbewaterloo
 waterlootechweek
+stan  # Toronto-based, may add non-Waterloo events
