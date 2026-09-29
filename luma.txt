@@ -1,0 +1,18 @@
+# One Luma calendar per line, most useful first.
+# Paste a luma.com link or just the part after luma.com/ (a cal-... id works too).
+# Checked Sept 29, 2026. Numbers are upcoming events at that point.
+
+waterlooevents              # Waterloo Tech (+adjacent) Events, the big curated one (33 upcoming)
+waterloo_ca                 # Luma's "What's Happening in Waterloo" city page
+communitech                 # Communitech: Startups & Beer, AI Power Hours (5)
+civictechwr                 # Civic Tech WR hack nights (12)
+ai_builders_club_waterloo   # AI Builders | Waterloo (3)
+calendar/cal-4QCKqWDQb6j61Jn  # Velocity Events
+waterlooventuregroup        # WVG (Waterloo Venture Group)
+akatos                      # Akatos founder house
+figmaatwaterloo             # Figma @ Waterloo
+uwdsc                       # UW Data Science Club
+buildersclub                # Builders Club
+uwblueprint                 # UW Blueprint
+cal-nOr38t0zT9446Di         # Ramp Emerging Talent (Ramp @ Waterloo coffee chats)
+waterlootechweek            # Waterloo Tech Week (quiet until next September)

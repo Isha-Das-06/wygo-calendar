@@ -1,4 +1,8 @@
-"""Build an iCal feed from Wygo organizer pages.
+"""Build iCal feeds from Wygo organizer pages and Luma calendars.
+
+Outputs in docs/: wygo.ics (Wygo only), luma.ics (Luma only) and
+all.ics (both, with duplicates removed).
+
 
 Reads organizers.txt, grabs each organizer's upcoming events, pulls the
 event details from the JSON-LD block on each event page, and writes
@@ -17,12 +21,16 @@ import requests
 from bs4 import BeautifulSoup
 from icalendar import Calendar, Event
 
+import luma
+
 BASE = "https://wygo.world"
 ROOT = Path(__file__).parent
 ORGS_FILE = ROOT / "organizers.txt"
 OUT_DIR = ROOT / "docs"
 ICS_FILE = OUT_DIR / "wygo.ics"
 STATE_FILE = OUT_DIR / "events.json"
+LUMA_FILE = OUT_DIR / "luma.ics"
+ALL_FILE = OUT_DIR / "all.ics"
 KEEP_PAST_DAYS = 45
 DELAY_SECONDS = 2  # be polite between requests
 
@@ -116,14 +124,19 @@ def event_from_ld(ld, slug):
     }
 
 
-def build_ics(events):
+def new_calendar(name):
     cal = Calendar()
     cal.add("prodid", "-//wygo-feed//EN")
     cal.add("version", "2.0")
-    cal.add("x-wr-calname", "Wygo events")
+    cal.add("x-wr-calname", name)
     cal.add("x-wr-timezone", "America/Toronto")
     cal.add("refresh-interval;value=duration", "PT6H")
+    return cal
+
+
+def wygo_components(events):
     now = datetime.now(timezone.utc)
+    out = []
     for e in sorted(events, key=lambda e: e["start"]):
         ev = Event()
         ev.add("uid", e["uid"])
@@ -140,8 +153,16 @@ def build_ics(events):
         desc = [d for d in (e["description"], f"Hosted by {e['organizer']}" if e["organizer"] else "", e["url"]) if d]
         ev.add("description", "\n\n".join(desc))
         ev.add("url", e["url"])
+        out.append(ev)
+    return out
+
+
+def write_ics(path, name, components):
+    cal = new_calendar(name)
+    for ev in sorted(components, key=lambda ev: luma.as_utc(ev["dtstart"].dt)):
         cal.add_component(ev)
-    return cal.to_ical()
+    path.write_bytes(cal.to_ical())
+    print(f"wrote {len(components)} events to {path.name}")
 
 
 def load_previous_state():
@@ -195,9 +216,25 @@ def main():
     state = {k: v for k, v in state.items() if datetime.fromisoformat(v["end"]) > cutoff}
 
     STATE_FILE.write_text(json.dumps(state, indent=2, sort_keys=True))
-    ICS_FILE.write_bytes(build_ics(state.values()))
-    print(f"wrote {len(state)} events to {ICS_FILE.relative_to(ROOT)}")
-    return 1 if failures and not state else 0
+    wygo_events = wygo_components(state.values())
+    write_ics(ICS_FILE, "Wygo events", wygo_events)
+
+    # Luma: download each calendar's own feed and merge them
+    luma_events, luma_failures = luma.collect(KEEP_PAST_DAYS)
+    write_ics(LUMA_FILE, "Luma events", list(luma_events.values()))
+
+    # everything in one calendar, skipping Luma copies of Wygo events
+    seen = {luma.title_key(ev["summary"], ev["dtstart"].dt) for ev in wygo_events}
+    combined = list(wygo_events)
+    for ev in luma_events.values():
+        key = luma.title_key(ev["summary"], ev["dtstart"].dt)
+        if key not in seen:
+            seen.add(key)
+            combined.append(ev)
+    write_ics(ALL_FILE, "Waterloo events (Wygo + Luma)", combined)
+
+    nothing = not state and not luma_events
+    return 1 if (failures or luma_failures) and nothing else 0
 
 
 if __name__ == "__main__":

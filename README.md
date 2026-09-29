@@ -1,24 +1,37 @@
-# Wygo calendar feed
+# Waterloo events calendar feed
 
-Wygo (wygo.world) has no calendar subscribe option, so this repo builds one.
-A GitHub Action runs every 6 hours, reads the upcoming events for each
-organizer in `organizers.txt`, and writes `docs/wygo.ics`. GitHub Pages
-serves that file so Google Calendar can subscribe to it. The Action deploys
+Wygo (wygo.world) has no calendar subscribe option, and Luma splits things
+across lots of separate calendars. This repo pulls both into iCal feeds you
+can subscribe to once in Google Calendar.
+
+A GitHub Action runs every 6 hours and publishes to GitHub Pages. It deploys
 straight to Pages and never commits, so the repo stays quiet on your profile.
 
 Setup: Settings → Pages → Source: **GitHub Actions**.
 
-Subscribe URL (after Pages is on):
-`https://isha-das-06.github.io/wygo-calendar/wygo.ics`
+## Feeds
+| Feed | What's in it |
+|---|---|
+| `https://isha-das-06.github.io/wygo-calendar/all.ics` | Everything, Wygo + Luma, duplicates removed |
+| `https://isha-das-06.github.io/wygo-calendar/wygo.ics` | Wygo only |
+| `https://isha-das-06.github.io/wygo-calendar/luma.ics` | Luma only |
 
-## Adding organizers
-Add the handle from `wygo.world/o/<handle>` to `organizers.txt` and commit.
-For user pages (`wygo.world/u/<handle>`), write `u/<handle>`.
-The Action runs automatically when that file changes.
+Subscribe in Google Calendar: Other calendars → + → From URL.
+
+## Adding sources
+- **Wygo:** add the handle from `wygo.world/o/<handle>` to `organizers.txt`.
+  For user pages (`wygo.world/u/<handle>`), write `u/<handle>`.
+- **Luma:** paste the calendar's luma.com link (or the part after `luma.com/`)
+  into `luma.txt`.
+
+Commit the file and the Action runs straight away.
 
 ## How it works
-- Organizer page: takes the event links listed under "Upcoming Events".
-- Event page: reads the schema.org Event JSON-LD (start, end, venue, description).
-- `events.json` (published next to the feed) remembers events so they stay on the calendar for 45 days
-  after they end.
-- Waits 2 seconds between requests and only checks upcoming events.
+- Wygo organizer page: takes the event links listed under "Upcoming Events",
+  then reads the schema.org Event JSON-LD on each event page. Waits 2 seconds
+  between requests and only checks upcoming events.
+- Luma: downloads each calendar's official iCal feed (`api.lu.ma/ics/get`).
+  Events on several calendars are kept once.
+- `all.ics` skips a Luma event when Wygo has one with the same title and start time.
+- Events stay on the calendar for 45 days after they end. `events.json`
+  (published next to the feeds) remembers Wygo events between runs.
