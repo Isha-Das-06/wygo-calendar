@@ -1,4 +1,15 @@
-# One Wygo organizer per line. Use the handle from wygo.world/o/<handle>
-# (a full URL or @handle works too). Lines starting with # are ignored.
+# One Wygo profile per line, most important first.
+# Org pages: just the handle from wygo.world/o/<handle>
+# User pages: prefix with u/ (for wygo.world/u/<handle>)
+# Lines starting with # are ignored. All handles below checked live on Sept 29, 2026.
 socratica
+communitech
+buildersclub
+wygo
+waterloo-engineering
+sipnscalewaterloo
+ramp-emerging-talent
+larkwin
+u/uwux
+u/nsbewaterloo
 waterlootechweek

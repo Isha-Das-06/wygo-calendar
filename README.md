@@ -10,6 +10,7 @@ Subscribe URL (after Pages is on):
 
 ## Adding organizers
 Add the handle from `wygo.world/o/<handle>` to `organizers.txt` and commit.
+For user pages (`wygo.world/u/<handle>`), write `u/<handle>`.
 The Action runs automatically when that file changes.
 
 ## How it works

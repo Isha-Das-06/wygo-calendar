@@ -38,15 +38,17 @@ def fetch(path):
 
 
 def read_organizers():
-    orgs = []
+    """Return profile paths like '/o/socratica' or '/u/uwux'."""
+    paths = []
     for line in ORGS_FILE.read_text().splitlines():
         line = line.split("#")[0].strip()
         if not line:
             continue
-        # accept "socratica", "@socratica" or a full wygo.world/o/socratica URL
-        line = line.rstrip("/").split("/o/")[-1].lstrip("@")
-        orgs.append(line)
-    return orgs
+        # accept "socratica", "@socratica", "u/uwux" or a full wygo.world URL
+        line = line.rstrip("/").replace(BASE, "").lstrip("/").lstrip("@")
+        kind, _, handle = line.rpartition("/")
+        paths.append(f"/{'u' if kind == 'u' else 'o'}/{handle}")
+    return paths
 
 
 def upcoming_slugs(html):
@@ -149,7 +151,7 @@ def main():
 
     for org in read_organizers():
         try:
-            slugs = upcoming_slugs(fetch(f"/o/{org}"))
+            slugs = upcoming_slugs(fetch(org))
         except Exception as exc:
             print(f"[warn] couldn't load organizer {org}: {exc}")
             failures += 1
