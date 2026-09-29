@@ -1,19 +1,26 @@
 name: Update Wygo calendar
 
+# Publishes docs/ straight to GitHub Pages without committing anything,
+# so this repo doesn't jump to the top of your profile every few hours.
+
 on:
   schedule:
     - cron: "17 */6 * * *"   # every 6 hours
   workflow_dispatch:          # lets you run it by hand from the Actions tab
   push:
-    paths:
-      - organizers.txt
-      - scrape.py
+    branches: [main]
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  update:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,10 +28,22 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: python scrape.py
-      - name: Commit feed if it changed
+      - name: Build feed
         run: |
-          git config user.name "wygo-feed-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add docs
-          git diff --cached --quiet || (git commit -m "Update Wygo feed" && git push)
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          export PREVIOUS_STATE_URL="https://${owner}.github.io/${GITHUB_REPOSITORY#*/}/events.json"
+          rm -f docs/events.json
+          python scrape.py
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

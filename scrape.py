@@ -144,9 +144,29 @@ def build_ics(events):
     return cal.to_ical()
 
 
+def load_previous_state():
+    """Events seen on earlier runs, so past events stay on the calendar.
+
+    The workflow doesn't commit anything back to the repo, so the last run's
+    events.json is read from the published Pages site (or a local copy).
+    """
+    if STATE_FILE.exists():
+        return json.loads(STATE_FILE.read_text())
+    import os
+    url = os.environ.get("PREVIOUS_STATE_URL")
+    if url:
+        try:
+            r = session.get(url, timeout=30)
+            if r.ok:
+                return r.json()
+        except Exception as exc:
+            print(f"[warn] couldn't load previous state: {exc}")
+    return {}
+
+
 def main():
     OUT_DIR.mkdir(exist_ok=True)
-    state = json.loads(STATE_FILE.read_text()) if STATE_FILE.exists() else {}
+    state = load_previous_state()
     failures = 0
 
     for org in read_organizers():
