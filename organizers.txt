@@ -1,0 +1,4 @@
+# One Wygo organizer per line. Use the handle from wygo.world/o/<handle>
+# (a full URL or @handle works too). Lines starting with # are ignored.
+socratica
+waterlootechweek

@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//wygo-feed//EN
+X-WR-CALNAME:Wygo events
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-WR-TIMEZONE:America/Toronto
+BEGIN:VEVENT
+SUMMARY:Making Dough: Socratica x Ramp Buildathon
+DTSTART:20261002T210000Z
+DTEND:20261003T020000Z
+DTSTAMP:20260929T123316Z
+UID:wygo-making-dough@wygo-feed
+DESCRIPTION:A bake-shop themed buildathon\n\nHosted by Socratica\n\nhttps:
+ //wygo.world/making-dough
+LOCATION:Communitech\, 151 Charles Street West\, Kitchener\, ON\, Canada
+URL:https://wygo.world/making-dough
+END:VEVENT
+END:VCALENDAR

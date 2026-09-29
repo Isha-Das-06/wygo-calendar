@@ -1,0 +1,13 @@
+{
+  "wygo-making-dough@wygo-feed": {
+    "description": "A bake-shop themed buildathon",
+    "end": "2026-10-02T22:00:00.940000-04:00",
+    "location": "Communitech, 151 Charles Street West, Kitchener, ON, Canada",
+    "organizer": "Socratica",
+    "start": "2026-10-02T17:00:00.940000-04:00",
+    "status": "https://schema.org/EventScheduled",
+    "title": "Making Dough: Socratica x Ramp Buildathon",
+    "uid": "wygo-making-dough@wygo-feed",
+    "url": "https://wygo.world/making-dough"
+  }
+}
